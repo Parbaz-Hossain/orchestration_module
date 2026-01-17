@@ -1,7 +1,7 @@
 """Base workflow state machine"""
 import uuid
-from typing import Dict, Any, Optional, List
-from dataclasses import dataclass, field
+from typing import Dict, Any, Optional, List, ClassVar
+from dataclasses import dataclass
 from statemachine import StateMachine, State
 
 
@@ -23,6 +23,10 @@ class ConversationWorkflow(StateMachine):
     
     workflow_type: str = "base"
     
+    # Subclasses should override this with their state definitions
+    # Maps state_id -> StateDefinition
+    state_definitions: ClassVar[Dict[str, StateDefinition]] = {}
+    
     def __init__(self, context: Dict[str, Any] = None):
         self.workflow_id = uuid.uuid4()
         self.context = context or {}
@@ -31,11 +35,15 @@ class ConversationWorkflow(StateMachine):
         self._total_steps = 0
         super().__init__()
     
+    def get_state_definition(self, state_id: str) -> Optional[StateDefinition]:
+        """Get the state definition for a given state ID"""
+        return self.state_definitions.get(state_id)
+    
     def get_current_instruction(self) -> Dict[str, Any]:
         """Generate instruction for AI agent based on current state"""
-        state_def = self.current_state.value
+        state_def = self.get_state_definition(self.current_state.id)
         
-        if not isinstance(state_def, StateDefinition):
+        if not state_def:
             return {
                 "instruction_type": "INFORM",
                 "prompt": "Processing...",
@@ -62,9 +70,9 @@ class ConversationWorkflow(StateMachine):
     
     def process_input(self, user_input: Any, input_type: str = None) -> bool:
         """Process user input and validate"""
-        state_def = self.current_state.value
+        state_def = self.get_state_definition(self.current_state.id)
         
-        if isinstance(state_def, StateDefinition) and state_def.expected_input:
+        if state_def and state_def.expected_input:
             # Validate input
             if state_def.validation:
                 if not self._validate_input(user_input, state_def.validation):

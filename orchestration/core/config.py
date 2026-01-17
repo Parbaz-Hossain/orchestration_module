@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "change-me-in-production"
     
     # Database
-    DATABASE_URL: str = "postgresql+asyncpg://user:password@localhost:5432/retail_cafe_db"
+    DATABASE_URL: str = "postgresql+asyncpg://postgres:pgadmin123@localhost:5432/orchestration_db"
     DB_POOL_SIZE: int = 5
     DB_MAX_OVERFLOW: int = 10
     

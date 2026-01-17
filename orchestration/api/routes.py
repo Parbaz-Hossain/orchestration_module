@@ -8,9 +8,7 @@ from orchestration.services.orchestrator import OrchestrationEngine
 from orchestration.schemas.session import SessionState
 from orchestration.schemas.instructions import InstructionPayload
 
-
 router = APIRouter(tags=["Orchestration"])
-
 
 class SessionInitRequest(BaseModel):
     """Request to initialize a session"""
@@ -19,12 +17,10 @@ class SessionInitRequest(BaseModel):
     user_name: str
     channel: str = "web"
 
-
 class SessionInitResponse(BaseModel):
     """Response with session and first instruction"""
     session: SessionState
     instruction: InstructionPayload
-
 
 @router.post("/sessions/init", response_model=SessionInitResponse)
 async def initialize_session(
@@ -41,7 +37,6 @@ async def initialize_session(
     
     return SessionInitResponse(session=session, instruction=instruction)
 
-
 @router.get("/sessions/{session_id}")
 async def get_session(
     session_id: str,
@@ -56,7 +51,6 @@ async def get_session(
         )
     return session
 
-
 @router.get("/work/{user_id}/{role}")
 async def get_pending_work(
     user_id: int,
@@ -66,7 +60,6 @@ async def get_pending_work(
     """Get prioritized pending work for a user"""
     work_items = await orchestrator.work_detector.get_prioritized_work(user_id, role)
     return {"items": work_items, "count": len(work_items)}
-
 
 @router.get("/workflows/types")
 async def get_workflow_types():

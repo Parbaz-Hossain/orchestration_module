@@ -9,68 +9,73 @@ class POCreationWorkflow(ConversationWorkflow):
     
     workflow_type = "po_creation"
     
-    # Define states with AI instructions
-    greeting = State(initial=True, value=StateDefinition(
-        instruction_type="DISPLAY",
-        prompt_template="Let me help you create a purchase order.\n\nItem: {title}\nCurrent Stock: {current_stock}\n\nBased on your history, I suggest ordering from the usual supplier.",
-        auto_advance=False
-    ))
+    # Define states WITHOUT value parameter
+    greeting = State(initial=True)
+    confirm_suggestion = State()
+    select_supplier = State()
+    specify_quantity = State()
+    review_order = State()
+    processing = State()
+    approval_pending = State()
+    complete = State(final=True)
+    cancelled = State(final=True)
     
-    confirm_suggestion = State(value=StateDefinition(
-        instruction_type="CONFIRM",
-        prompt_template="Would you like to proceed with a reorder based on your last order?",
-        expected_input="use_suggestions",
-        options=[
-            {"value": "yes", "label": "Yes, use last order details"},
-            {"value": "modify", "label": "Modify details"},
-            {"value": "cancel", "label": "Cancel"}
-        ]
-    ))
-    
-    select_supplier = State(value=StateDefinition(
-        instruction_type="SELECT",
-        prompt_template="Which supplier would you like to order from?",
-        expected_input="supplier_id"
-    ))
-    
-    specify_quantity = State(value=StateDefinition(
-        instruction_type="ASK",
-        prompt_template="How much would you like to order?\n\nSuggested quantity: {suggested_quantity} based on average usage.",
-        expected_input="quantity",
-        validation={"type": "number", "min": 1, "max": 10000}
-    ))
-    
-    review_order = State(value=StateDefinition(
-        instruction_type="CONFIRM",
-        prompt_template="Order Summary:\n\n• Item: {item_name}\n• Quantity: {quantity}\n• Supplier: {supplier_name}\n• Estimated Total: ${estimated_total}\n\nConfirm this order?",
-        expected_input="confirmation",
-        options=[
-            {"value": "confirm", "label": "Confirm & Submit"},
-            {"value": "edit", "label": "Edit Order"},
-            {"value": "cancel", "label": "Cancel"}
-        ]
-    ))
-    
-    processing = State(value=StateDefinition(
-        instruction_type="INFORM",
-        prompt_template="Creating your purchase order...",
-        auto_advance=True
-    ))
-    
-    approval_pending = State(value=StateDefinition(
-        instruction_type="INFORM",
-        prompt_template="Purchase Order #{po_number} has been created and submitted for approval.\n\nApprover: {approver_name}\nExpected response: Within 24 hours"
-    ))
-    
-    complete = State(final=True, value=StateDefinition(
-        instruction_type="INFORM",
-        prompt_template="Purchase Order #{po_number} has been created successfully!"
-    ))
-    
-    cancelled = State(final=True, value=StateDefinition(
-        instruction_type="INFORM",
-        prompt_template="Order cancelled."
-    ))
+    # Define state definitions in a separate dictionary
+    state_definitions = {
+        "greeting": StateDefinition(
+            instruction_type="DISPLAY",
+            prompt_template="Let me help you create a purchase order.\n\nItem: {title}\nCurrent Stock: {current_stock}\n\nBased on your history, I suggest ordering from the usual supplier.",
+            auto_advance=False
+        ),
+        "confirm_suggestion": StateDefinition(
+            instruction_type="CONFIRM",
+            prompt_template="Would you like to proceed with a reorder based on your last order?",
+            expected_input="use_suggestions",
+            options=[
+                {"value": "yes", "label": "Yes, use last order details"},
+                {"value": "modify", "label": "Modify details"},
+                {"value": "cancel", "label": "Cancel"}
+            ]
+        ),
+        "select_supplier": StateDefinition(
+            instruction_type="SELECT",
+            prompt_template="Which supplier would you like to order from?",
+            expected_input="supplier_id"
+        ),
+        "specify_quantity": StateDefinition(
+            instruction_type="ASK",
+            prompt_template="How much would you like to order?\n\nSuggested quantity: {suggested_quantity} based on average usage.",
+            expected_input="quantity",
+            validation={"type": "number", "min": 1, "max": 10000}
+        ),
+        "review_order": StateDefinition(
+            instruction_type="CONFIRM",
+            prompt_template="Order Summary:\n\n• Item: {item_name}\n• Quantity: {quantity}\n• Supplier: {supplier_name}\n• Estimated Total: ${estimated_total}\n\nConfirm this order?",
+            expected_input="confirmation",
+            options=[
+                {"value": "confirm", "label": "Confirm & Submit"},
+                {"value": "edit", "label": "Edit Order"},
+                {"value": "cancel", "label": "Cancel"}
+            ]
+        ),
+        "processing": StateDefinition(
+            instruction_type="INFORM",
+            prompt_template="Creating your purchase order...",
+            auto_advance=True
+        ),
+        "approval_pending": StateDefinition(
+            instruction_type="INFORM",
+            prompt_template="Purchase Order #{po_number} has been created and submitted for approval.\n\nApprover: {approver_name}\nExpected response: Within 24 hours"
+        ),
+        "complete": StateDefinition(
+            instruction_type="INFORM",
+            prompt_template="Purchase Order #{po_number} has been created successfully!"
+        ),
+        "cancelled": StateDefinition(
+            instruction_type="INFORM",
+            prompt_template="Order cancelled."
+        ),
+    }
     
     # Transitions
     start = greeting.to(confirm_suggestion)

@@ -4,7 +4,6 @@ from typing import Dict, Any, Type, Optional
 from .base import ConversationWorkflow
 from .po_creation import POCreationWorkflow
 from .stock_adjustment import StockAdjustmentWorkflow
-from .leave_request import LeaveRequestWorkflow
 
 
 class WorkflowRegistry:
@@ -14,8 +13,7 @@ class WorkflowRegistry:
         "po_creation": POCreationWorkflow,
         "low_stock_reorder": POCreationWorkflow,  # Alias
         "stock_adjustment": StockAdjustmentWorkflow,
-        "inventory_count": StockAdjustmentWorkflow,  # Alias
-        "leave_request": LeaveRequestWorkflow,
+        "inventory_count": StockAdjustmentWorkflow  # Alias
     }
     
     @classmethod
