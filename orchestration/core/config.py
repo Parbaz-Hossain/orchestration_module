@@ -1,51 +1,50 @@
-"""Application configuration using pydantic-settings"""
-from functools import lru_cache
-from typing import Optional
+"""
+Configuration settings for the Orchestration Module
+"""
+from typing import List, Optional
 from pydantic_settings import BaseSettings
+from functools import lru_cache
 
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables"""
     
-    # Application
+    # App settings
     APP_NAME: str = "Orchestration Module"
-    APP_ENV: str = "development"
     DEBUG: bool = True
-    SECRET_KEY: str = "change-me-in-production"
+    HOST: str = "0.0.0.0"
+    PORT: int = 8000
     
     # Database
     DATABASE_URL: str = "postgresql+asyncpg://postgres:pgadmin123@localhost:5432/orchestration_db"
-    DB_POOL_SIZE: int = 5
-    DB_MAX_OVERFLOW: int = 10
+    DATABASE_ECHO: bool = False
     
-    # Redis
-    REDIS_URL: str = "redis://localhost:6379/0"
+    # CORS
+    CORS_ORIGINS: List[str] = ["*"]
     
-    # WebSocket
-    WS_HEARTBEAT_INTERVAL: int = 30
-    WS_CONNECTION_TIMEOUT: int = 300
+    # Seeding
+    SEED_ON_STARTUP: bool = True
     
-    # Priority Calculation
-    PRIORITY_REFRESH_INTERVAL_MINUTES: int = 5
+    # JWT/Auth (if needed for your integration)
+    SECRET_KEY: str = "your-secret-key-change-in-production"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
-    # Workflow Settings
-    WORKFLOW_SESSION_TIMEOUT_MINUTES: int = 30
-    MAX_PAUSED_TASKS: int = 5
-    
-    # Priority Weights
-    PRIORITY_WEIGHT_URGENCY: float = 0.30
-    PRIORITY_WEIGHT_IMPACT: float = 0.25
-    PRIORITY_WEIGHT_DEPENDENCY: float = 0.20
-    PRIORITY_WEIGHT_FINANCIAL: float = 0.15
-    PRIORITY_WEIGHT_AGING: float = 0.10
+    # AI/LLM Settings (optional, for agent integration)
+    LLM_API_KEY: Optional[str] = None
+    LLM_MODEL: str = "gpt-4"
+    LLM_BASE_URL: Optional[str] = None
     
     class Config:
         env_file = ".env"
+        env_file_encoding = "utf-8"
         case_sensitive = True
+        extra = "allow"
 
 
 @lru_cache()
 def get_settings() -> Settings:
+    """Get cached settings instance"""
     return Settings()
 
 

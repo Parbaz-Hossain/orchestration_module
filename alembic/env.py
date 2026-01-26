@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 from orchestration.core.config import settings
-from orchestration.core.database import Base
+from orchestration.models.orchestration_models import Base
 from orchestration.models import *  # Import all models
 
 config = context.config
