@@ -1,3 +1,5 @@
-"""Core module - Configuration and dependencies"""
+"""Core package for orchestration module"""
 from .config import settings
-from .dependencies import get_db, get_orchestrator
+from .database import get_async_session, async_session_maker, engine
+
+__all__ = ["settings", "get_async_session", "async_session_maker", "engine"]
